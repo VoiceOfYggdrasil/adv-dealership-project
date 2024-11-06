@@ -4,9 +4,16 @@ public abstract class Contract {
     protected String date;
     protected String customerName;
     protected String customerEmail;
-    protected String vehicleSold;
+    protected Vehicle vehicleSold;
     protected double totalPrice;
     protected double monthlyPayment;
+
+    public Contract(String date, String customerName, String customerEmail, Vehicle vehicleSold) {
+        this.date = date;
+        this.customerName = customerName;
+        this.customerEmail = customerEmail;
+        this.vehicleSold = vehicleSold;
+    }
 
     public String getDate() {
         return date;
@@ -20,15 +27,14 @@ public abstract class Contract {
         return customerEmail;
     }
 
-    public String getVehicleSold() {
+    public Vehicle getVehicleSold() {
         return vehicleSold;
     }
 
-    public double getTotalPrice() {
-        return totalPrice;
-    }
+    public abstract double getMonthlyPayment();
 
-    public double getMonthlyPayment() {
-        return monthlyPayment;
-    }
+    public abstract double getTotalPrice();
+
+    @Override
+    public abstract String toString();
 }

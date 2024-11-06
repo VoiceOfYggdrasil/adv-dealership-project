@@ -1,6 +1,7 @@
 
 package com.pluralsight;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
 
@@ -27,6 +28,7 @@ public class UserInterface {
             System.out.println("7. Get all vehicles");
             System.out.println("8. Add vehicle");
             System.out.println("9. Remove vehicle");
+            System.out.println("10. Enter a New Contract");
             System.out.println("99. Quit");
 
             System.out.print("Enter your choice: ");
@@ -60,6 +62,9 @@ public class UserInterface {
                 case "9":
                     processRemoveVehicleRequest();
                     break;
+                case "10":
+                    processNewContract();
+                    break;
                 case "99":
                     quit = true;
                     break;
@@ -67,6 +72,80 @@ public class UserInterface {
                     System.out.println("Invalid choice. Please try again.");
             }
         }
+    }
+
+    public void processNewContract() {
+        System.out.print("Enter [SALE] or [LEASE]: ");
+        String choice = scanner.nextLine();
+
+        if (choice.equalsIgnoreCase("sale")) {
+            processNewSale();
+        } else if (choice.equalsIgnoreCase("lease")) {
+            processNewLease();
+        } else {
+            System.out.println("ERROR: Invalid Input.");
+        }
+    }
+
+    public void processNewSale() {
+        System.out.print("Enter Date: ");
+        String date = scanner.nextLine();
+        System.out.print("Enter Customer Name: ");
+        String customerName = scanner.nextLine();
+        System.out.print("Enter Customer Email: ");
+        String customerEmail = scanner.nextLine();
+        System.out.print("Enter Vehicle VIN: ");
+        int vin = scanner.nextInt();
+        scanner.nextLine();
+
+        Vehicle vehicle = dealership.getVehiclesByVin(vin);
+
+        if (vehicle == null) {
+            return;
+        }
+
+        System.out.print("Are you financing? Y or N: ");
+        String choice = scanner.nextLine();
+
+        boolean isFinanced;
+
+        if (choice.equalsIgnoreCase("y")) {
+            isFinanced = true;
+        } else if (choice.equalsIgnoreCase("n")) {
+            isFinanced = false;
+        } else {
+            System.out.println("ERROR: Invalid Choice.");
+            return;
+        }
+
+        SalesContract salesContract = new SalesContract(date, customerName, customerEmail, vehicle, isFinanced);
+        ContractFileManager contractFileManager = new ContractFileManager();
+        contractFileManager.saveContract(salesContract);
+        dealership.removeVehicle(vehicle);
+    }
+
+    public void processNewLease() {
+        System.out.print("Enter Date: ");
+        String date = scanner.nextLine();
+        System.out.print("Enter Customer Name: ");
+        String customerName = scanner.nextLine();
+        System.out.print("Enter Customer Email: ");
+        String customerEmail = scanner.nextLine();
+        System.out.print("Enter Vehicle VIN: ");
+        int vin = scanner.nextInt();
+        scanner.nextLine();
+
+        Vehicle vehicle = dealership.getVehiclesByVin(vin);
+
+        if ((LocalDate.now().getYear() - vehicle.getYear()) > 3) {
+            System.out.println("ERROR: Cannot lease vehicle older than 3 years.");
+            return;
+        }
+
+        LeaseContract leaseContract = new LeaseContract(date, customerName, customerEmail, vehicle);
+        ContractFileManager contractFileManager = new ContractFileManager();
+        contractFileManager.saveContract(leaseContract);
+        dealership.removeVehicle(vehicle);
     }
 
     public void processGetByPriceRequest() {
